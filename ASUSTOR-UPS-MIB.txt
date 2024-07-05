@@ -1,0 +1,129 @@
+ASUSTOR-UPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-GROUP, MODULE-COMPLIANCE
+				FROM SNMPv2-CONF
+	enterprises, MODULE-IDENTITY, OBJECT-TYPE, Integer32
+				FROM SNMPv2-SMI;
+				
+asustor	 OBJECT IDENTIFIER 
+	::= { enterprises 44738 }
+	
+asustorUps MODULE-IDENTITY
+    ORGANIZATION "www.asustor.com"
+    CONTACT-INFO
+         "postal: ASUSTOR Inc.
+		 email: support@asustor.com"
+    DESCRIPTION
+        "Characteristics of the ups information"
+    ::= { asustor 6 }
+	
+upsTable OBJECT-TYPE
+    SYNTAX	   SEQUENCE OF UpsEntry
+    MAX-ACCESS	  not-accessible
+    STATUS	   current
+    DESCRIPTION
+    "Asustor ups table"
+    ::= { asustorUps 1 }
+
+UpsEntry ::= SEQUENCE {
+    upsIndex		Integer32,
+    upsManufacture	OCTET STRING,
+	upsModel				OCTET STRING,
+	upsVendorId			OCTET STRING,
+	upsProductId		OCTET STRING,
+	upsBatteryRemainSecond	Integer32,
+	upsBatteryChargePercent    Integer32
+}
+
+--variable upsIndex is defined to INDEX column
+upsEntry	  OBJECT-TYPE
+    SYNTAX	   UpsEntry
+    MAX-ACCESS	  not-accessible
+    STATUS	   current
+    DESCRIPTION
+    "For all ups entry"
+    INDEX   { upsIndex }
+    ::= { upsTable 1 }
+
+upsIndex OBJECT-TYPE
+    SYNTAX	   Integer32(0..2147483647)
+    MAX-ACCESS	  not-accessible
+    STATUS	   current
+    DESCRIPTION
+    "The index of ups table"
+    ::= { upsEntry 1 }
+
+upsManufacture OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "The ups bay"
+    ::= { upsEntry 2 }
+
+upsModel OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "The ups model name"
+    ::= { upsEntry 3 }
+
+upsVendorId OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "The ups type, including SATA, SSD."
+    ::= { upsEntry 4 }
+
+upsProductId OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Asustor ups smart status"
+    ::= { upsEntry 5 }
+
+upsBatteryRemainSecond OBJECT-TYPE
+    SYNTAX	   Integer32
+    MAX-ACCESS	  read-only
+    STATUS	   current
+    DESCRIPTION
+    "The temperature of each ups uses Celsius degree"
+    ::= { upsEntry 6 }		
+
+upsBatteryChargePercent OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "The ups manufacturer"
+    ::= { upsEntry 7 }
+
+upsConformances OBJECT IDENTIFIER ::= { asustorUps 2 }
+upsCompliances OBJECT IDENTIFIER ::= { upsConformances 1 }
+upsGroups 			OBJECT IDENTIFIER ::= { upsConformances 2 }
+
+upsCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance force implement the ASUSTOR UPS MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { upsGroup }
+    ::= { upsCompliances 1 }
+
+upsGroup OBJECT-GROUP
+    OBJECTS { upsManufacture,
+                           upsModel,
+                           upsVendorId,
+						   upsProductId,
+						   upsBatteryRemainSecond,
+						   upsBatteryChargePercent }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing basic information of an asustor ups entity."
+    ::= { upsGroups 1 }
+
+END
